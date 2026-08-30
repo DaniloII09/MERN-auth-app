@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
-import { sendVerificationEmail } from "../mailtrap/emails.js";
+import { sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
 
 export const signup = async (req, res) => {
   const { email, password, name } = req.body;
@@ -28,10 +28,17 @@ export const signup = async (req, res) => {
       verificationToken,
       verificationTokenExpiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
     });
-
-    await sendVerificationEmail(user.email, verificationToken);
-
     await user.save();
+
+    try {
+      await sendVerificationEmail(user.email, verificationToken);
+    } catch (emailError) {
+      // error logged in sendVerificationEmail function
+      await User.deleteOne({ _id: user._id }); // Rollback user creation if email fails
+      return res
+        .status(500)
+        .json({ message: "Failed to send verification email" });
+    }
 
     // jwt
     generateTokenAndSetCookie(res, user._id);
@@ -45,6 +52,40 @@ export const signup = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+    console.log("Error in signup", error);
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  const { code } = req.body;
+
+  try {
+    const user = await User.findOne({
+      verificationToken: code,
+      verificationTokenExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired verification code" });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
+    await user.save();
+
+    try {
+      await sendWelcomeEmail(user.email, user.name);
+    } catch (emailError) {
+      // error logged in sendWelcomeEmail function
+    }
+
+    res.status(200).json({ message: "Email verified successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+    console.log("Error in verify email", error);
   }
 };
 
