@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
+import { sendVerificationEmail } from "../mailtrap/emails.js";
 
 export const signup = async (req, res) => {
   const { email, password, name } = req.body;
@@ -25,8 +26,10 @@ export const signup = async (req, res) => {
       password: hashedPassword,
       name,
       verificationToken,
-      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+      verificationTokenExpiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
     });
+
+    await sendVerificationEmail(user.email, verificationToken);
 
     await user.save();
 
@@ -40,7 +43,6 @@ export const signup = async (req, res) => {
         password: undefined,
       },
     });
-    
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
