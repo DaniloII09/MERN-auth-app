@@ -57,8 +57,8 @@ export const signup = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
     console.log("Error in signup", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -94,8 +94,8 @@ export const resendVerificationEmail = async (req, res) => {
 
     res.status(200).json({ message: "Verification email sent successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
     console.log("Error in resend verification email", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -131,8 +131,8 @@ export const verifyEmail = async (req, res) => {
 
     res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
     console.log("Error in verify email", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -169,8 +169,8 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
     console.log("Error in login", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -217,8 +217,8 @@ export const forgotPassword = async (req, res) => {
 
     res.status(200).json({ message: "Password reset link sent to your email" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
     console.log("Error in forgot password", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -260,14 +260,12 @@ export const resetPassword = async (req, res) => {
     try {
       await sendPasswordResetSuccessEmail(user.email);
     } catch (emailError) {
-      return res
-        .status(500)
-        .json({ message: "Failed to send password reset confirmation email" });
+      // error logged in sendPasswordResetSuccessEmail function
     }
 
     res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
     console.log("Error in reset password", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
