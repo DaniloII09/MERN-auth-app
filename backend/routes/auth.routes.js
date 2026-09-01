@@ -13,6 +13,7 @@ import {
   resendVerificationLimiter,
   verifyEmailLimiter,
   forgotPasswordLimiter,
+  resetPasswordLimiter
 } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
@@ -27,7 +28,7 @@ router.post(
 router.post("/verify-email", verifyEmailLimiter, verifyEmail);
 
 router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
-router.post("/reset-password/:token", resetPassword);
+router.post("/reset-password/:token", resetPasswordLimiter, resetPassword);
 
 router.post("/login", authLimiter, login); 
 router.post("/logout", logout);
