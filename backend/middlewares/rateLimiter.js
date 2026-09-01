@@ -21,7 +21,7 @@ export const verifyEmailLimiter = createRateLimiter(
   "Too many verification attempts, please try again later",
 );
 
-export const resendVerificationCodeLimiter = createRateLimiter(
+export const resendVerificationLimiter = createRateLimiter(
   60 * 1000, // 1 minute
   1, // limit each IP to 1 request per windowMs
   "Please wait before requesting another code",
