@@ -32,3 +32,9 @@ export const forgotPasswordLimiter = createRateLimiter(
   1, // limit each IP to 1 request per windowMs
   "Please wait before requesting another reset link",
 );
+
+export const resetPasswordLimiter = createRateLimiter(
+  15 * 60 * 1000, // 15 minutes
+  5, // limit each IP to 5 requests per windowMs
+  "Too many reset attempts, please try again later",
+);

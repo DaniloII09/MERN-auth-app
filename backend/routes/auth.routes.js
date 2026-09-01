@@ -29,7 +29,7 @@ router.post("/verify-email", verifyEmailLimiter, verifyEmail);
 router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 
-router.post("/login", authLimiter, login);
+router.post("/login", authLimiter, login); 
 router.post("/logout", logout);
 
 export default router;
