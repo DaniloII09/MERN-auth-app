@@ -1,13 +1,14 @@
 import express from "express";
 import { login, logout, signup, resendVerificationEmail, verifyEmail } from "../controllers/auth.controller.js";
+import { authLimiter, resendLimiter, verifyEmailLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
 
-router.post("/signup", signup);
-router.post("/resend-verification-email", resendVerificationEmail);
-router.post("/verify-email", verifyEmail);
+router.post("/signup", authLimiter, signup);
+router.post("/resend-verification-email", resendLimiter, resendVerificationEmail);
+router.post("/verify-email", verifyEmailLimiter, verifyEmail);
 
-router.post("/login", login);
+router.post("/login", authLimiter, login);
 router.post("/logout", logout);
 
 export default router;
