@@ -17,16 +17,15 @@ export const signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = Math.floor(
-      100000 + Math.random() * 900000,
-    ).toString();
+
+    const { token: verificationToken, expiresAt } = generateVerificationToken();
 
     const user = new User({
       email,
       password: hashedPassword,
       name,
       verificationToken,
-      verificationTokenExpiresAt: Date.now() + 15 * 60 * 1000, // 15 minutes
+      verificationTokenExpiresAt: expiresAt,
     });
     await user.save();
 
@@ -56,10 +55,51 @@ export const signup = async (req, res) => {
   }
 };
 
+export const resendVerificationEmail = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "User is already verified" });
+    }
+
+    const { token: verificationToken, expiresAt } = generateVerificationToken();
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpiresAt = expiresAt;
+    await user.save();
+
+    try {
+      await sendVerificationEmail(user.email, verificationToken);
+    } catch (emailError) {
+      return res
+        .status(500)
+        .json({ message: "Failed to send verification email" });
+    }
+
+    res.status(200).json({ message: "Verification email sent successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+    console.log("Error in resend verification email", error);
+  }
+};
+
 export const verifyEmail = async (req, res) => {
   const { code } = req.body;
 
   try {
+    if (!code) {
+      return res.status(400).json({ message: "Verification code is required" });
+    }
+
     const user = await User.findOne({
       verificationToken: code,
       verificationTokenExpiresAt: { $gt: Date.now() },
