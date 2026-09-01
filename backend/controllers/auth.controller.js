@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 import { sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/emails.js";
+import { generateVerificationToken } from "../utils/generateVerificationToken.js";
 
 export const signup = async (req, res) => {
   const { email, password, name } = req.body;
@@ -134,5 +135,6 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.send("Logout route");
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logged out successfully" });
 };
