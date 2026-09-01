@@ -5,15 +5,15 @@ import {
   sendVerificationEmail,
   sendWelcomeEmail,
   sendPasswordResetEmail,
-  sendPasswordResetSuccessEmail
+  sendPasswordResetSuccessEmail,
 } from "../mailtrap/emails.js";
 import { generateVerificationToken } from "../utils/generateVerificationToken.js";
 import crypto from "crypto";
 
 export const signup = async (req, res) => {
-  const { email, password, name } = req.body;
-
   try {
+    const { email, password, name } = req.body;
+
     if (!email || !password || !name) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -63,9 +63,9 @@ export const signup = async (req, res) => {
 };
 
 export const resendVerificationEmail = async (req, res) => {
-  const { email } = req.body;
-
   try {
+    const { email } = req.body;
+
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
     }
@@ -100,9 +100,9 @@ export const resendVerificationEmail = async (req, res) => {
 };
 
 export const verifyEmail = async (req, res) => {
-  const { code } = req.body;
-
   try {
+    const { code } = req.body;
+
     if (!code) {
       return res.status(400).json({ message: "Verification code is required" });
     }
@@ -137,9 +137,9 @@ export const verifyEmail = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
+
     if (!email || !password) {
       return res
         .status(400)
@@ -180,8 +180,8 @@ export const logout = async (req, res) => {
 };
 
 export const forgotPassword = async (req, res) => {
-  const { email } = req.body;
   try {
+    const { email } = req.body;
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
     }
@@ -227,6 +227,12 @@ export const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
+    if (!token || !password) {
+      return res
+        .status(400)
+        .json({ message: "Token and new password are required" });
+    }
+
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpiresAt: { $gt: Date.now() },
@@ -238,13 +244,18 @@ export const resetPassword = async (req, res) => {
         .json({ message: "Invalid or expired reset token" });
     }
 
+    const isSamePassword = await bcrypt.compare(password, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({
+        message: "New password must be different from the current one",
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpiresAt = undefined;
     await user.save();
-
-    res.status(200).json({ message: "Password reset successfully" });
 
     try {
       await sendPasswordResetSuccessEmail(user.email);
@@ -253,6 +264,8 @@ export const resetPassword = async (req, res) => {
         .status(500)
         .json({ message: "Failed to send password reset confirmation email" });
     }
+
+    res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
     console.log("Error in reset password", error);
