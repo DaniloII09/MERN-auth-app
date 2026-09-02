@@ -1,13 +1,20 @@
 import rateLimit from "express-rate-limit";
 
-const createRateLimiter = (windowMs, limit, message) =>
-  rateLimit({
+const RATE_LIMIT_ENABLED = process.env.RATE_LIMIT_ENABLED !== "false";
+
+const passthrough = (req, res, next) => next();
+
+const createRateLimiter = (windowMs, limit, message) => {
+  if (!RATE_LIMIT_ENABLED) return passthrough;
+
+  return rateLimit({
     windowMs,
     limit,
     standardHeaders: "draft-7",
     legacyHeaders: false,
     message: { message },
   });
+};
 
 export const authLimiter = createRateLimiter(
   15 * 60 * 1000, // 15 minutes
