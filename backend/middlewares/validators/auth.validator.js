@@ -1,5 +1,5 @@
 import { body, param } from "express-validator";
-import { isCommonPassword } from "../../utils/commonPaswords";
+import { isCommonPassword } from "../../utils/commonPaswords.js";
 
 const passwordRules = () =>
   body("password")
