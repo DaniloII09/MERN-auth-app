@@ -14,10 +14,6 @@ export const signup = async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
-    if (!email || !password || !name) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
       return res.status(400).json({ message: "User already exists" });
@@ -66,10 +62,6 @@ export const resendVerificationEmail = async (req, res) => {
   try {
     const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
@@ -103,10 +95,6 @@ export const verifyEmail = async (req, res) => {
   try {
     const { code } = req.body;
 
-    if (!code) {
-      return res.status(400).json({ message: "Verification code is required" });
-    }
-
     const user = await User.findOne({
       verificationToken: code,
       verificationTokenExpiresAt: { $gt: Date.now() },
@@ -139,12 +127,6 @@ export const verifyEmail = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
-    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -182,9 +164,6 @@ export const logout = async (req, res) => {
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -226,13 +205,7 @@ export const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
-
-    if (!token || !password) {
-      return res
-        .status(400)
-        .json({ message: "Token and new password are required" });
-    }
-
+    
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpiresAt: { $gt: Date.now() },
