@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 
 import { connectDB } from "./db/connectDB.js";
 
@@ -11,10 +12,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
-app.use(express.json());
+app.use(helmet());
+app.set("trust proxy", 1);
+
+app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
-app.use("/api/auth", authRoutes)
+app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => {
   connectDB();
