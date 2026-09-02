@@ -1,4 +1,5 @@
 import { body, param } from "express-validator";
+import { isCommonPassword } from "../../utils/commonPaswords";
 
 const passwordRules = () =>
   body("password")
@@ -14,7 +15,13 @@ const passwordRules = () =>
     .matches(/[0-9]/)
     .withMessage("Password must contain at least one number")
     .matches(/[^A-Za-z0-9]/)
-    .withMessage("Password must contain at least one special character");
+    .withMessage("Password must contain at least one special character")
+    .custom((value) => {
+      if (isCommonPassword(value)) {
+        throw new Error("This password is too common, please choose another");
+      }
+      return true;
+    });
 
 export const signupValidator = [
   body("email")
