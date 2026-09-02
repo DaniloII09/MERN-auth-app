@@ -7,6 +7,7 @@ import {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  checkAuth,
 } from "../controllers/auth.controller.js";
 import {
   authLimiter,
@@ -15,10 +16,15 @@ import {
   forgotPasswordLimiter,
   resetPasswordLimiter
 } from "../middlewares/rateLimiter.js";
+import { verifyToken } from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
+router.get("/check-auth", verifyToken, checkAuth);
+
 router.post("/signup", authLimiter, signup);
+router.post("/login", authLimiter, login); 
+router.post("/logout", logout);
 
 router.post(
   "/resend-verification-email",
@@ -29,8 +35,5 @@ router.post("/verify-email", verifyEmailLimiter, verifyEmail);
 
 router.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
 router.post("/reset-password/:token", resetPasswordLimiter, resetPassword);
-
-router.post("/login", authLimiter, login); 
-router.post("/logout", logout);
 
 export default router;
