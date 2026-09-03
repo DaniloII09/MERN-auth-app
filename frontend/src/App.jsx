@@ -1,11 +1,14 @@
 import FloatingShape from "./components/FloatingShape";
+import { Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 
 function App() {
   return (
     <div
       className="min-h-screen bg-linear-to-br 
     from-zinc-900 via-neutral-900 to-black 
-    flex justify-center relative overflow-hidden"
+    flex items-center justify-center relative overflow-hidden"
     >
       <FloatingShape
         color="bg-yellow-400"
@@ -20,7 +23,7 @@ function App() {
         top="70%"
         left="80%"
         delay={5}
-      /> 
+      />
       <FloatingShape
         color="bg-dortmund-yellow"
         size="w-32 h-32"
@@ -28,6 +31,12 @@ function App() {
         left="-10%"
         delay={2}
       />
+
+      <Routes>
+        <Route path="/" element={"Home"} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+      </Routes>
     </div>
   );
 }
