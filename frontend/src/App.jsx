@@ -7,7 +7,7 @@ function App() {
   return (
     <div
       className="min-h-screen bg-linear-to-br 
-    from-zinc-900 via-neutral-900 to-black 
+    from-zinc-900 via-amber-950 to-black 
     flex items-center justify-center relative overflow-hidden"
     >
       <FloatingShape
