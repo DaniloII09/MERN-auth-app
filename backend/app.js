@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 
@@ -12,9 +13,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
 
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(helmet());
 app.set("trust proxy", 1);
-
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 app.use(sanitizeMongo);
