@@ -43,6 +43,7 @@ router.post(
 );
 router.post(
   "/verify-email",
+  verifyToken,
   verifyEmailLimiter,
   verifyEmailValidator,
   validate,

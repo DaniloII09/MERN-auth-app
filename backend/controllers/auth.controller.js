@@ -96,6 +96,7 @@ export const verifyEmail = async (req, res) => {
     const { code } = req.body;
 
     const user = await User.findOne({
+      _id: req.userId, 
       verificationToken: code,
       verificationTokenExpiresAt: { $gt: Date.now() },
     });

@@ -6,10 +6,18 @@ import toast from "react-hot-toast";
 
 const VerifyEmailPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [resendCooldown, setResendCooldown] = useState(60);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
 
-  const { verifyEmail, error, errors, isLoading } = useAuthStore();
+  const {
+    verifyEmail,
+    resendVerificationEmail,
+    user,
+    error,
+    errors,
+    isLoading,
+  } = useAuthStore();
 
   const handleChange = (index, value) => {
     const newCode = [...code];
@@ -53,11 +61,33 @@ const VerifyEmailPage = () => {
     }
   };
 
+  const handleResend = async () => {
+    try {
+      await resendVerificationEmail(user.email);
+      toast.success("A new code has been sent to your email");
+      setCode(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+      setResendCooldown(60);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error resending code");
+    }
+  };
+
   useEffect(() => {
     if (code.every((digit) => digit !== "")) {
       handleSubmit(new Event("submit"));
     }
   }, [code]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   return (
     <div className="max-w-md w-full bg-zinc-800/50 backdrop-filter backdrop-blur-xl rounded-2xl shadow-xl overflow-hidden">
@@ -108,6 +138,17 @@ const VerifyEmailPage = () => {
           >
             {isLoading ? "Verifying..." : "Verify Email"}
           </motion.button>
+          <p className="text-center text-zinc-400 text-sm mt-4">
+            Didn't receive the code?{" "}
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={isLoading || resendCooldown > 0}
+              className="text-dortmund-yellow font-semibold hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
+            >
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend"}
+            </button>
+          </p>
         </form>
       </motion.div>
     </div>
