@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import Input from "../components/Input";
 import { Mail, User, Lock, Loader } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 import { useAuthStore } from "../store/auth.store";
@@ -12,7 +12,7 @@ const SignupPage = () => {
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
-  const { signup, error, errors, isLoading } = useAuthStore();
+  const { signup, error, errors, isLoading, clearError } = useAuthStore();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -24,6 +24,10 @@ const SignupPage = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   return (
     <motion.div
@@ -60,7 +64,7 @@ const SignupPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          {error && <p className='text-red-500 font-semibold mt-2'>{error}</p>}
+          {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
           {errors && errors.length > 0 && (
             <ul className="mt-2 space-y-1">
               {errors.map((err, i) => (

@@ -17,6 +17,7 @@ const VerifyEmailPage = () => {
     error,
     errors,
     isLoading,
+    clearError,
   } = useAuthStore();
 
   const handleChange = (index, value) => {
@@ -72,6 +73,10 @@ const VerifyEmailPage = () => {
       toast.error(error.response?.data?.message || "Error resending code");
     }
   };
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   useEffect(() => {
     if (code.every((digit) => digit !== "")) {

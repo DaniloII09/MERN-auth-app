@@ -1,18 +1,26 @@
 import { motion } from "framer-motion";
 import Input from "../components/Input";
 import { Mail, Lock, Loader } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "../store/auth.store";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const isLoading = false;
+  const { login, isLoading, error, errors, clearError } = useAuthStore();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    try {
+      await login(email, password);
+    } catch (error) {}
   };
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   return (
     <motion.div
@@ -30,7 +38,7 @@ const LoginPage = () => {
         <form onSubmit={handleLogin}>
           <Input
             icon={Mail}
-            type="email"
+            type="text"
             placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -51,7 +59,16 @@ const LoginPage = () => {
               Forgot Password?
             </Link>
           </div>
-
+          {error && <p className="text-red-500 font-semibold mb-2">{error}</p>}
+          {errors && errors.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {errors.map((err, i) => (
+                <li key={i} className="text-red-500 text-sm font-semibold">
+                  {err.message}
+                </li>
+              ))}
+            </ul>
+          )}
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

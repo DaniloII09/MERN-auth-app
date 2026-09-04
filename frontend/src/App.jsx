@@ -23,7 +23,11 @@ function App() {
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900">
+      <div
+        className="min-h-screen bg-linear-to-br 
+    from-zinc-900 via-yellow-950 to-yellow-800
+    flex items-center justify-center relative overflow-hidden"
+      >
         <Loader className="size-10 animate-spin text-dortmund-yellow" />
       </div>
     );

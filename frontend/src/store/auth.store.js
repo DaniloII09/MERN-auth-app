@@ -11,7 +11,7 @@ export const useAuthStore = create((set) => ({
   errors: [],
   isLoading: false,
   isCheckingAuth: true,
-
+  clearError: () => set({ error: null, errors: [] }),
   signup: async (email, password, name) => {
     set({ isLoading: true, error: null, errors: [] });
     try {
@@ -69,6 +69,27 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       set({
         error: error.response?.data?.message || "Error verifying email",
+        errors: error.response?.data?.errors || [],
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+  login: async (email, password) => {
+    set({ isLoading: true, error: null, errors: [] });
+    try {
+      const response = await axios.post(`${API_AUTH_URL}/login`, {
+        email,
+        password,
+      });
+      set({
+        user: response.data.user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error logging in",
         errors: error.response?.data?.errors || [],
         isLoading: false,
       });
