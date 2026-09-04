@@ -15,7 +15,9 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       await login(email, password);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {

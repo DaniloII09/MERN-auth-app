@@ -12,8 +12,8 @@ import {
   RedirectAuthenticatedUser,
   RequireVerification,
 } from "./guards/routeGuards";
-import { Loader } from "lucide-react";
 import LoadingSpinner from "./components/LoadingSpinner";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 function App() {
   const { checkAuth, isCheckingAuth } = useAuthStore();
@@ -85,6 +85,14 @@ function App() {
             <RequireVerification>
               <VerifyEmailPage />
             </RequireVerification>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <RedirectAuthenticatedUser>
+              <ForgotPasswordPage />
+            </RedirectAuthenticatedUser>
           }
         />
       </Routes>

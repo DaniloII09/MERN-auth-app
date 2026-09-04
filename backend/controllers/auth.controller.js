@@ -179,35 +179,32 @@ export const forgotPassword = async (req, res) => {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
+
+    if (user && user.isVerified) {
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;
+
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpiresAt = resetTokenExpiresAt;
+      await user.save();
+
+      const CLIENT_URL = process.env.CLIENT_URL;
+      try {
+        await sendPasswordResetEmail(
+          user.email,
+          `${CLIENT_URL}/reset-password/${resetToken}`,
+        );
+      } catch (emailError) {
+        return res
+          .status(500)
+          .json({ message: "Failed to send password reset email" });
+      }
     }
 
-    if (!user.isVerified) {
-      return res.status(400).json({ message: "User is not verified" });
-    }
-
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000; //1 hour
-
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpiresAt = resetTokenExpiresAt;
-    await user.save();
-
-    const CLIENT_URL = process.env.CLIENT_URL;
-
-    try {
-      await sendPasswordResetEmail(
-        user.email,
-        `${CLIENT_URL}/reset-password/${resetToken}`,
-      );
-    } catch (emailError) {
-      return res
-        .status(500)
-        .json({ message: "Failed to send password reset email" });
-    }
-
-    res.status(200).json({ message: "Password reset link sent to your email" });
+    res.status(200).json({
+      message:
+        "If an account exists for that email, a reset link has been sent",
+    });
   } catch (error) {
     console.log("Error in forgot password", error);
     res.status(500).json({ message: "Server error" });
