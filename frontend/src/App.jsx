@@ -13,6 +13,7 @@ import {
   RequireVerification,
 } from "./guards/routeGuards";
 import { Loader } from "lucide-react";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 function App() {
   const { checkAuth, isCheckingAuth } = useAuthStore();
@@ -22,15 +23,7 @@ function App() {
   }, [checkAuth]);
 
   if (isCheckingAuth) {
-    return (
-      <div
-        className="min-h-screen bg-linear-to-br 
-    from-zinc-900 via-yellow-950 to-yellow-800
-    flex items-center justify-center relative overflow-hidden"
-      >
-        <Loader className="size-10 animate-spin text-dortmund-yellow" />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
