@@ -34,6 +34,26 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+  resendVerificationEmail: async (email) => {
+    set({ isLoading: true, error: null, errors: [] });
+    try {
+      const response = await axios.post(
+        `${API_AUTH_URL}/resend-verification-email`,
+        {
+          email,
+        },
+      );
+      set({ isLoading: false });
+      return response.data;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error resending code",
+        errors: error.response?.data?.errors || [],
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
   verifyEmail: async (code) => {
     set({ isLoading: true, error: null, errors: [] });
     try {
@@ -55,21 +75,21 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
-  resendVerificationEmail: async (email) => {
-  set({ isLoading: true, error: null, errors: [] });
-  try {
-    const response = await axios.post(`${API_AUTH_URL}/resend-verification-email`, {
-      email,
-    });
-    set({ isLoading: false });
-    return response.data;
-  } catch (error) {
-    set({
-      error: error.response?.data?.message || "Error resending code",
-      errors: error.response?.data?.errors || [],
-      isLoading: false,
-    });
-    throw error;
-  }
-},
+  checkAuth: async () => {
+    set({ isCheckingAuth: true, error: null, errors: [] });
+    try {
+      const response = await axios.get(`${API_AUTH_URL}/check-auth`);
+      set({
+        user: response.data.user,
+        isAuthenticated: true,
+        isCheckingAuth: false,
+      });
+    } catch (error) {
+      set({
+        error: null,
+        errors: [],
+        isCheckingAuth: false,
+      });
+    }
+  },
 }));

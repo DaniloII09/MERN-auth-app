@@ -16,7 +16,9 @@ export const signup = async (req, res) => {
 
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
-      return res.status(400).json({ message: "User with that email already exists" });
+      return res
+        .status(400)
+        .json({ message: "User with that email already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -96,7 +98,7 @@ export const verifyEmail = async (req, res) => {
     const { code } = req.body;
 
     const user = await User.findOne({
-      _id: req.userId, 
+      _id: req.userId,
       verificationToken: code,
       verificationTokenExpiresAt: { $gt: Date.now() },
     });
@@ -118,7 +120,13 @@ export const verifyEmail = async (req, res) => {
       // error logged in sendWelcomeEmail function
     }
 
-    res.status(200).json({ message: "Email verified successfully" });
+    res.status(200).json({
+      message: "Email verified successfully",
+      user: {
+        ...user._doc,
+        password: undefined,
+      },
+    });
   } catch (error) {
     console.log("Error in verify email", error);
     res.status(500).json({ message: "Server error" });
