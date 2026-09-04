@@ -1,12 +1,15 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuthStore } from "../store/auth.store";
+import toast from "react-hot-toast";
 
 const VerifyEmailPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
-  const isLoading = false;
+
+  const { verifyEmail, error, errors, isLoading } = useAuthStore();
 
   const handleChange = (index, value) => {
     const newCode = [...code];
@@ -37,11 +40,17 @@ const VerifyEmailPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const verificationCode = code.join("");
-    console.log(`Verification code submitted: ${verificationCode}`);
+    try {
+      await verifyEmail(verificationCode);
+      navigate("/");
+      toast.success("Email verified successfully");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -80,7 +89,16 @@ const VerifyEmailPage = () => {
               />
             ))}
           </div>
-
+          {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
+          {errors && errors.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {errors.map((err, i) => (
+                <li key={i} className="text-red-500 text-sm font-semibold">
+                  {err.message}
+                </li>
+              ))}
+            </ul>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

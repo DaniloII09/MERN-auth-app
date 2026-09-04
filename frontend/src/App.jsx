@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
@@ -37,8 +38,10 @@ function App() {
         <Route path="/" element={"Home"} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />}/>
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Routes>
+
+      <Toaster />
     </div>
   );
 }
