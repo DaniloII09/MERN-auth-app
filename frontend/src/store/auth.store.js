@@ -122,14 +122,29 @@ export const useAuthStore = create((set) => ({
       });
       set({
         isLoading: false,
-        error: null,
-        errors: [],
       });
       return true;
     } catch (error) {
       set({
         error:
           error.response?.data?.message || "Error sending reset password email",
+        errors: error.response?.data?.errors || [],
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+  resetPassword: async (token, password) => {
+    set({ isLoading: true, error: null, errors: [] });
+    try {
+      await axios.post(`${API_AUTH_URL}/reset-password/${token}`, { password });
+      set({
+        isLoading: false,
+      });
+      return true;
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error reseting password",
         errors: error.response?.data?.errors || [],
         isLoading: false,
       });
@@ -151,6 +166,7 @@ export const useAuthStore = create((set) => ({
         errors: [],
         isCheckingAuth: false,
       });
+      throw error;
     }
   },
 }));
